@@ -18,7 +18,7 @@ Open http://127.0.0.1:8000. Keep the terminal running; Ctrl+C stops it. Serve ov
 
 ## Controls
 
-Search and select a demo city. Save favorites locally. Paste a direct HTTPS audio-stream URL and press Play stream. Playback begins only after a user gesture. Stop ends playback.
+Search and select a demo city. Save favorites locally and use Saved cities only to filter them. Empty searches clear the active selection and disable saving until a visible city is available. Paste a direct HTTPS audio-stream URL and press Play stream. Playback begins only after a user gesture. Stop ends playback and clears the stream source. Native audio controls provide pause/resume and volume. Connection or buffering that does not recover within 15 seconds is stopped with a message. Stream playback is independent of the fictional city/station selection. Media error codes produce network/codec explanations.
 
 ## Project structure
 
@@ -74,3 +74,4 @@ Use small, reviewable changes with a clear user benefit. Add model tests when be
 ## License
 
 A redistribution license has not yet been selected. Public visibility alone does not grant an open-source license.
+

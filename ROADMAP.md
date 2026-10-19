@@ -23,3 +23,6 @@ Initial prototype created 2026-10-17. Re-read repository contents and latest com
 - Local HTTP document/module/style serving and HTML anchor/ID integrity checked.
 - Browser rendering and interaction QA **not completed**: no installed Chromium; browser download failed. No screenshot is claimed.
 - Implementation is proposed on `feat/initial-experience` for review; inspect open PRs before starting the next change. Prioritize desktop/mobile and keyboard browser review next.
+
+
+2026-10-18: Added saved-city filtering, consistent empty selections, native audio controls, bounded connection/buffering waits, media-error explanations and stream cleanup. Six model tests pass. Real browser/audio playback, directory integration and codec-aware station health remain unverified or pending.

@@ -7,3 +7,4 @@ test('stored favorites are validated and deduplicated',()=>{assert.deepEqual(loa
 test('filtered city selection follows visible results',()=>{const visible=filterStations('Lisbon');assert.equal(chooseStation(visible,'tokyo').id,'lisbon');assert.equal(chooseStation([], 'tokyo'),null);});
 test('favorite toggle preserves valid ids without duplicates',()=>{assert.deepEqual(toggleFavorite(['tokyo','tokyo'],'tokyo'),[]);assert.deepEqual(toggleFavorite([], 'lisbon'),['lisbon']);assert.deepEqual(toggleFavorite(['tokyo'],'unknown'),['tokyo']);});
 test('media failures have actionable explanations',()=>{assert.match(mediaErrorMessage(2),/Network/);assert.match(mediaErrorMessage(3),/decoded/);assert.match(mediaErrorMessage(4),/format/);assert.match(mediaErrorMessage(999),/Unable/);});
+

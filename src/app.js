@@ -44,3 +44,4 @@ audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.pause
 audio.addEventListener('pause',()=>{if(audio.getAttribute('src')&&audio.paused&&(audio.currentTime>0||audio.readyState>=2)){clearWatchdog();$('#status').textContent='Stream paused. Resume with the audio controls.';}});
 audio.addEventListener('ended',()=>{clearWatchdog();if(audio.getAttribute('src'))$('#status').textContent='Stream ended.';});
 window.addEventListener('pagehide',()=>halt());render();
+

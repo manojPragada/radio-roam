@@ -9,6 +9,7 @@ const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.geoj
 async function scenario(page,base,reduced){
 
   await page.locator('#search').fill('Lisbon');assert.equal(await page.locator('#name').textContent(),'Lisbon Sol');
+  await page.locator('#list button').click();await page.reload();await page.waitForFunction(()=>document.querySelector('#name').textContent==='Lisbon Sol');
   await page.locator('#favorite').click();await page.locator('#saved-only').check();await page.locator('#search').fill('');assert.equal(await page.locator('#list button').count(),1);
   await page.reload();await page.waitForFunction(()=>document.querySelector('#list button').textContent.includes('Tokyo'));
   await page.locator('#saved-only').check();assert.equal(await page.locator('#list button').count(),1);
@@ -60,3 +61,4 @@ async function main(){
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
+

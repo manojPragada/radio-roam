@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-10-21: Added validated, local-only restoration of the last selected fictional station without persisting stream URLs; browser reload coverage included. Next: codec-aware health/retry controls before any directory integration.
+
 2026-10-20: Added repeatable Playwright regression checks and a public-repository-only CI workflow. Desktop, mobile and motion-enabled scenarios passed locally using Chromium 153; model tests and syntax checks passed. Screenshots generated locally for inspection. Earlier browser-unavailable notes below are historical. No deployment or live-provider validation performed. Next: expand browser coverage and review the existing PR before merging.
 
 Initial prototype created 2026-10-17. Re-read repository contents and latest commits before continuing. No hosted deployment. No live data integrations.
@@ -28,4 +30,5 @@ Initial prototype created 2026-10-17. Re-read repository contents and latest com
 
 
 2026-10-18: Added saved-city filtering, consistent empty selections, native audio controls, bounded connection/buffering waits, media-error explanations and stream cleanup. Six model tests pass. Real browser/audio playback, directory integration and codec-aware station health remain unverified or pending.
+
 

@@ -2,6 +2,7 @@ export const stations=[{id:'tokyo',name:'Tokyo Afterglow',city:'Tokyo',genre:'Im
 export function filterStations(query){const q=query.trim().toLowerCase();return stations.filter(s=>(s.name+' '+s.city+' '+s.genre).toLowerCase().includes(q));}
 export function streamURL(value){try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password?url.href:null;}catch{return null;}}
 export function loadFavorites(raw){try{const value=JSON.parse(raw);return Array.isArray(value)?[...new Set(value.filter(id=>stations.some(s=>s.id===id)))]:[];}catch{return [];}}
+export function loadLastStation(raw){return stations.find(station=>station.id===raw)??stations[0];}
 
 
 export function chooseStation(visible, id) { return visible.find(station=>station.id===id)??visible[0]??null; }
@@ -13,4 +14,5 @@ export function toggleFavorite(favorites, id) {
 export function mediaErrorMessage(code) {
   return ({1:'Playback was interrupted.',2:'Network error while loading the stream.',3:'The stream could not be decoded.',4:'Unsupported audio format or unavailable stream.'})[code]??'Unable to play this stream.';
 }
+
 

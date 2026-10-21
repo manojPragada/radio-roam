@@ -1,14 +1,15 @@
-import { stations, filterStations, streamURL, loadFavorites, chooseStation, toggleFavorite, mediaErrorMessage } from './model.js';
+import { stations, filterStations, streamURL, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
+try{selected=loadLastStation(localStorage.getItem('radio-roam-last-station'));}catch{}
 function render(){
   const items=filterStations($('#search').value).filter(station=>!$('#saved-only').checked||favorites.includes(station.id));
   selected=chooseStation(items,selected?.id);$('#empty').hidden=items.length>0;$('#list').replaceChildren();$('#markers').replaceChildren();
   for(const station of items){
     const button=document.createElement('button');button.dataset.station=station.id;button.textContent=(favorites.includes(station.id)?'★ ':'')+station.city;
     button.setAttribute('aria-pressed',String(station===selected));button.addEventListener('click',()=>{
-      selected=station;render();[...$('#list').children].find(button=>button.dataset.station===selected?.id)?.focus();
+      selected=station;try{localStorage.setItem('radio-roam-last-station',selected.id);}catch{}render();[...$('#list').children].find(button=>button.dataset.station===selected?.id)?.focus();
     });$('#list').append(button);
     const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',(station.lon+180)/360*800);dot.setAttribute('cy',(90-station.lat)/180*400);dot.setAttribute('r',station===selected?8:4);dot.setAttribute('class','marker');$('#markers').append(dot);
   }
@@ -44,4 +45,5 @@ audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.pause
 audio.addEventListener('pause',()=>{if(audio.getAttribute('src')&&audio.paused&&(audio.currentTime>0||audio.readyState>=2)){clearWatchdog();$('#status').textContent='Stream paused. Resume with the audio controls.';}});
 audio.addEventListener('ended',()=>{clearWatchdog();if(audio.getAttribute('src'))$('#status').textContent='Stream ended.';});
 window.addEventListener('pagehide',()=>halt());render();
+
 

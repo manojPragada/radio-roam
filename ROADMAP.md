@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-10-22: Added wrapping arrow-key navigation and Home/End shortcuts for the filtered city list, with model and real-browser coverage. Next: codec-aware stream health and retry controls before any directory integration.
+
 2026-10-21: Added validated, local-only restoration of the last selected fictional station without persisting stream URLs; browser reload coverage included. Next: codec-aware health/retry controls before any directory integration.
 
 2026-10-20: Added repeatable Playwright regression checks and a public-repository-only CI workflow. Desktop, mobile and motion-enabled scenarios passed locally using Chromium 153; model tests and syntax checks passed. Screenshots generated locally for inspection. Earlier browser-unavailable notes below are historical. No deployment or live-provider validation performed. Next: expand browser coverage and review the existing PR before merging.

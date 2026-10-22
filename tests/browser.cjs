@@ -8,6 +8,8 @@ const root=path.resolve(__dirname,'..');
 const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.geojson':'application/geo+json'};
 async function scenario(page,base,reduced){
 
+  await page.locator('#list button').first().focus();await page.keyboard.press('ArrowUp');assert.equal(await page.locator('#list button').last().evaluate(element=>document.activeElement===element),true);await page.keyboard.press('Home');assert.equal(await page.locator('#list button').first().evaluate(element=>document.activeElement===element),true);
+
   await page.locator('#search').fill('Lisbon');assert.equal(await page.locator('#name').textContent(),'Lisbon Sol');
   await page.locator('#list button').click();await page.reload();await page.waitForFunction(()=>document.querySelector('#name').textContent==='Lisbon Sol');
   await page.locator('#favorite').click();await page.locator('#saved-only').check();await page.locator('#search').fill('');assert.equal(await page.locator('#list button').count(),1);

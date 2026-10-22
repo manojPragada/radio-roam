@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage } from './model.js';
+import { stations, filterStations, streamURL, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -8,7 +8,10 @@ function render(){
   selected=chooseStation(items,selected?.id);$('#empty').hidden=items.length>0;$('#list').replaceChildren();$('#markers').replaceChildren();
   for(const station of items){
     const button=document.createElement('button');button.dataset.station=station.id;button.textContent=(favorites.includes(station.id)?'★ ':'')+station.city;
-    button.setAttribute('aria-pressed',String(station===selected));button.addEventListener('click',()=>{
+    button.setAttribute('aria-pressed',String(station===selected));button.addEventListener('keydown',event=>{
+      const buttons=[...$('#list').children],next=stationIndexForKey(buttons.indexOf(button),buttons.length,event.key);
+      if(next!==buttons.indexOf(button)){event.preventDefault();buttons[next].focus();}
+    });button.addEventListener('click',()=>{
       selected=station;try{localStorage.setItem('radio-roam-last-station',selected.id);}catch{}render();[...$('#list').children].find(button=>button.dataset.station===selected?.id)?.focus();
     });$('#list').append(button);
     const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',(station.lon+180)/360*800);dot.setAttribute('cy',(90-station.lat)/180*400);dot.setAttribute('r',station===selected?8:4);dot.setAttribute('class','marker');$('#markers').append(dot);

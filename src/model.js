@@ -3,6 +3,13 @@ export function filterStations(query){const q=query.trim().toLowerCase();return 
 export function streamURL(value){try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password?url.href:null;}catch{return null;}}
 export function loadFavorites(raw){try{const value=JSON.parse(raw);return Array.isArray(value)?[...new Set(value.filter(id=>stations.some(s=>s.id===id)))]:[];}catch{return [];}}
 export function loadLastStation(raw){return stations.find(station=>station.id===raw)??stations[0];}
+export function stationIndexForKey(index,length,key) {
+  if(!Number.isInteger(index)||length<1)return -1;
+  if(key==='Home')return 0;if(key==='End')return length-1;
+  if(key==='ArrowDown'||key==='ArrowRight')return (index+1)%length;
+  if(key==='ArrowUp'||key==='ArrowLeft')return (index-1+length)%length;
+  return index;
+}
 
 
 export function chooseStation(visible, id) { return visible.find(station=>station.id===id)??visible[0]??null; }

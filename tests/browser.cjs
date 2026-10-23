@@ -22,6 +22,8 @@ async function scenario(page,base,reduced){
   await page.locator('#stream').fill('https://audio.test/sample.wav');await page.locator('#play').click();
   await page.waitForFunction(()=>/Playing your supplied stream|Stream ended/.test(document.querySelector('#status').textContent));
   await page.locator('#stop').click();assert.equal(await page.locator('#audio').getAttribute('src'),null);
+  assert.equal(await page.locator('#retry').isDisabled(),false);await page.locator('#retry').click();await page.waitForFunction(()=>/Playing your supplied stream|Stream ended/.test(document.querySelector('#status').textContent));
+  await page.reload();assert.equal(await page.locator('#retry').isDisabled(),true);
 
 }
 async function main(){

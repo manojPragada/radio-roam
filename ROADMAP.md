@@ -9,10 +9,12 @@
 ## Next
 
 - [ ] Integrate an attributed station directory after verifying terms
-- [ ] Add codec-aware station health and retry controls
+- [ ] Add codec-aware station health (session-only retry control complete)
 - [ ] Add globe view and persistent last-played station
 
 ## Continuity
+
+2026-10-22: Added an explicit, user-initiated retry for the last validated stream URL. The URL stays only in page memory, is never added to local storage and is cleared on reload/page exit. Next: surface codec capability hints without claiming remote stream availability.
 
 2026-10-22: Added wrapping arrow-key navigation and Home/End shortcuts for the filtered city list, with model and real-browser coverage. Next: codec-aware stream health and retry controls before any directory integration.
 

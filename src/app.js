@@ -25,7 +25,8 @@ $('#favorite').addEventListener('click',()=>{
   try{localStorage.setItem('radio-roam-favorites',JSON.stringify(favorites));}catch{$('#status').textContent='Favorites available for this session only.';}
   render();
 });
-const audio=$('#audio');let generation=0,watchdog=null;
+const audio=$('#audio');let generation=0,watchdog=null,lastStream=null;
+const retry=document.createElement('button');retry.id='retry';retry.type='button';retry.textContent='Retry last stream';retry.disabled=true;$('#stop').after(retry);
 function clearWatchdog(){if(watchdog!==null)clearTimeout(watchdog);watchdog=null;}
 function halt(message='Playback stopped.'){
   generation++;clearWatchdog();audio.pause();audio.removeAttribute('src');audio.load();$('#status').textContent=message;
@@ -34,19 +35,23 @@ function armWatchdog(){
   clearWatchdog();const current=generation;
   watchdog=setTimeout(()=>{if(current===generation)halt('Connection or buffering timed out after 15 seconds. Try another direct stream.');},15000);
 }
-$('#stream-form').addEventListener('submit',async event=>{
-  event.preventDefault();const url=streamURL($('#stream').value);
-  if(!url){$('#status').textContent='Use a direct HTTPS URL without embedded credentials.';return;}
+async function playStream(url){
   halt('Connecting to your supplied stream…');const current=generation;audio.src=url;armWatchdog();
   try{await audio.play();if(current===generation){clearWatchdog();$('#status').textContent='Playing your supplied stream, independently of the fictional city selection.';}}
   catch{if(current===generation)halt('Unable to play. Check the URL, browser permission, codec or network.');}
+}
+$('#stream-form').addEventListener('submit',async event=>{
+  event.preventDefault();const url=streamURL($('#stream').value);
+  if(!url){$('#status').textContent='Use a direct HTTPS URL without embedded credentials.';return;}
+  lastStream=url;retry.disabled=false;await playStream(url);
 });
+retry.addEventListener('click',()=>{if(lastStream)playStream(lastStream);});
 $('#stop').addEventListener('click',()=>halt());
 audio.addEventListener('error',()=>{if(audio.getAttribute('src'))halt(mediaErrorMessage(audio.error?.code));});
 audio.addEventListener('waiting',()=>{if(audio.getAttribute('src')){$('#status').textContent='Buffering your stream…';armWatchdog();}});
 audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.paused){clearWatchdog();$('#status').textContent='Playing your supplied stream.';}});
 audio.addEventListener('pause',()=>{if(audio.getAttribute('src')&&audio.paused&&(audio.currentTime>0||audio.readyState>=2)){clearWatchdog();$('#status').textContent='Stream paused. Resume with the audio controls.';}});
 audio.addEventListener('ended',()=>{clearWatchdog();if(audio.getAttribute('src'))$('#status').textContent='Stream ended.';});
-window.addEventListener('pagehide',()=>halt());render();
+window.addEventListener('pagehide',()=>{lastStream=null;retry.disabled=true;halt();});render();
 
 

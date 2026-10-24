@@ -1,0 +1,68 @@
+/* Real browser smoke checks. Start their own loopback static server; never deploy. */
+const assert=require('node:assert/strict');
+const fs=require('node:fs/promises');
+const http=require('node:http');
+const path=require('node:path');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright');
+const root=path.resolve(__dirname,'..');
+const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.geojson':'application/geo+json'};
+async function scenario(page,base,reduced){
+
+  await page.locator('#list button').first().focus();await page.keyboard.press('ArrowUp');assert.equal(await page.locator('#list button').last().evaluate(element=>document.activeElement===element),true);await page.keyboard.press('Home');assert.equal(await page.locator('#list button').first().evaluate(element=>document.activeElement===element),true);
+
+  await page.locator('#search').fill('Lisbon');assert.equal(await page.locator('#name').textContent(),'Lisbon Sol');
+  await page.locator('#list button').click();await page.reload();await page.waitForFunction(()=>document.querySelector('#name').textContent==='Lisbon Sol');
+  await page.locator('#favorite').click();await page.locator('#saved-only').check();await page.locator('#search').fill('');assert.equal(await page.locator('#list button').count(),1);
+  await page.reload();await page.waitForFunction(()=>document.querySelector('#list button').textContent.includes('Tokyo'));
+  await page.locator('#saved-only').check();assert.equal(await page.locator('#list button').count(),1);
+  await page.locator('#search').fill('missing');assert.equal(await page.locator('#favorite').isDisabled(),true);
+  const samples=8000,pcm=Buffer.alloc(samples*2),wav=Buffer.alloc(44+pcm.length);
+  wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(samples,24);wav.writeUInt32LE(samples*2,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(pcm.length,40);pcm.copy(wav,44);
+  await page.route('https://audio.test/sample.wav',route=>route.fulfill({status:200,contentType:'audio/wav',body:wav}));
+  await page.locator('#stream').fill('https://audio.test/sample.wav');assert.match(await page.locator('#format-hint').textContent(),/WAV filename hint.*not verified/);await page.locator('#play').click();
+  await page.waitForFunction(()=>/Playing your supplied stream|Stream ended/.test(document.querySelector('#status').textContent));
+  await page.locator('#stop').click();assert.equal(await page.locator('#audio').getAttribute('src'),null);
+  assert.equal(await page.locator('#retry').isDisabled(),false);await page.locator('#retry').click();await page.waitForFunction(()=>/Playing your supplied stream|Stream ended/.test(document.querySelector('#status').textContent));
+  await page.reload();assert.equal(await page.locator('#retry').isDisabled(),true);
+
+}
+async function main(){
+  const server=http.createServer(async(req,res)=>{
+    try{
+      let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+      if(pathname==='/favicon.ico'){res.writeHead(204);res.end();return;}
+      if(pathname==='/')pathname='/index.html';
+      const file=path.resolve(root,'.'+pathname);
+      if(!file.startsWith(root+path.sep)||pathname.split('/').some(part=>part.startsWith('.'))||!mime[path.extname(file)]){res.writeHead(404);res.end();return;}
+      const body=await fs.readFile(file);res.writeHead(200,{'Content-Type':mime[path.extname(file)]});res.end(body);
+    }catch{res.writeHead(404);res.end();}
+  });
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const base=`http://127.0.0.1:${server.address().port}/`;
+  let browser;
+  try{
+    browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
+    await fs.mkdir(path.join(root,'test-results'),{recursive:true});
+    for(const profile of [{name:'desktop',width:1440,height:1000,reduced:true},{name:'mobile',width:390,height:844,reduced:true},{name:'motion',width:1440,height:1000,reduced:false}]){
+      const context=await browser.newContext({viewport:{width:profile.width,height:profile.height},reducedMotion:profile.reduced?'reduce':'no-preference'});
+      const page=await context.newPage();page.setDefaultTimeout(10000);const errors=[];
+      page.on('pageerror',error=>errors.push(error.message));
+      await context.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
+      try{
+        await page.goto(base);await page.waitForFunction(()=>document.querySelector('main')!==null);await page.waitForLoadState('networkidle');
+        await page.keyboard.press('Tab');assert.equal(await page.locator('.skip').evaluate(el=>document.activeElement===el),true,'Skip link must be first keyboard target');
+        await page.evaluate(()=>document.activeElement.blur());
+        if(profile.name!=='motion')await page.screenshot({path:path.join(root,'test-results',profile.name+'.jpg'),type:'jpeg',quality:75,fullPage:true});
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Horizontal overflow');
+        await scenario(page,base,profile.reduced);
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Horizontal overflow after interactions');
+        assert.deepEqual(errors,[],'Uncaught browser errors');
+        console.log(profile.name+' browser scenario passed');
+      }catch(error){await page.screenshot({path:path.join(root,'test-results',profile.name+'-failure.png'),fullPage:true}).catch(()=>{});throw error;}
+      finally{await context.close();}
+    }
+    console.log('Chromium '+browser.version()+': all 3 browser scenarios passed. Screenshots: test-results/');
+  }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
+}
+main().catch(error=>{console.error(error);process.exitCode=1;});
+

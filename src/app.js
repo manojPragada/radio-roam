@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, streamFormatHint, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -26,6 +26,8 @@ $('#favorite').addEventListener('click',()=>{
   render();
 });
 const audio=$('#audio');let generation=0,watchdog=null,lastStream=null;
+const formatHint=document.createElement('p');formatHint.id='format-hint';formatHint.className='small muted';formatHint.setAttribute('aria-live','polite');$('#stream').after(formatHint);
+function updateFormatHint(){formatHint.textContent=streamFormatHint($('#stream').value);}$('#stream').addEventListener('input',updateFormatHint);updateFormatHint();
 const retry=document.createElement('button');retry.id='retry';retry.type='button';retry.textContent='Retry last stream';retry.disabled=true;$('#stop').after(retry);
 function clearWatchdog(){if(watchdog!==null)clearTimeout(watchdog);watchdog=null;}
 function halt(message='Playback stopped.'){
@@ -41,7 +43,7 @@ async function playStream(url){
   catch{if(current===generation)halt('Unable to play. Check the URL, browser permission, codec or network.');}
 }
 $('#stream-form').addEventListener('submit',async event=>{
-  event.preventDefault();const url=streamURL($('#stream').value);
+  event.preventDefault();updateFormatHint();const url=streamURL($('#stream').value);
   if(!url){$('#status').textContent='Use a direct HTTPS URL without embedded credentials.';return;}
   lastStream=url;retry.disabled=false;await playStream(url);
 });

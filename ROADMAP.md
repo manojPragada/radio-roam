@@ -9,10 +9,12 @@
 ## Next
 
 - [ ] Integrate an attributed station directory after verifying terms
-- [ ] Add codec-aware station health (session-only retry control complete)
+- [ ] Add codec-aware station health (session-only retry and non-authoritative filename hints complete)
 - [ ] Add globe view and persistent last-played station
 
 ## Continuity
+
+2026-10-23: Added immediate, non-authoritative format hints for common audio filename extensions. Hints never probe the remote stream or claim browser capability/availability. Next: capability checks that remain distinct from remote health.
 
 2026-10-22: Added an explicit, user-initiated retry for the last validated stream URL. The URL stays only in page memory, is never added to local storage and is cleared on reload/page exit. Next: surface codec capability hints without claiming remote stream availability.
 

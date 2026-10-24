@@ -19,7 +19,7 @@ async function scenario(page,base,reduced){
   const samples=8000,pcm=Buffer.alloc(samples*2),wav=Buffer.alloc(44+pcm.length);
   wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(samples,24);wav.writeUInt32LE(samples*2,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(pcm.length,40);pcm.copy(wav,44);
   await page.route('https://audio.test/sample.wav',route=>route.fulfill({status:200,contentType:'audio/wav',body:wav}));
-  await page.locator('#stream').fill('https://audio.test/sample.wav');await page.locator('#play').click();
+  await page.locator('#stream').fill('https://audio.test/sample.wav');assert.match(await page.locator('#format-hint').textContent(),/WAV filename hint.*not verified/);await page.locator('#play').click();
   await page.waitForFunction(()=>/Playing your supplied stream|Stream ended/.test(document.querySelector('#status').textContent));
   await page.locator('#stop').click();assert.equal(await page.locator('#audio').getAttribute('src'),null);
   assert.equal(await page.locator('#retry').isDisabled(),false);await page.locator('#retry').click();await page.waitForFunction(()=>/Playing your supplied stream|Stream ended/.test(document.querySelector('#status').textContent));

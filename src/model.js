@@ -7,6 +7,11 @@ export function streamFormatHint(value){
   const names={mp3:'MP3',aac:'AAC',m4a:'AAC',ogg:'Ogg',opus:'Opus',wav:'WAV'};
   return names[extension]?`${names[extension]} filename hint · browser support and stream availability are not verified.`:'Format unknown from the URL · browser support and stream availability are not verified.';
 }
+export function capabilitySummary(check){
+  const formats=[['MP3','audio/mpeg'],['AAC','audio/aac'],['Ogg','audio/ogg; codecs="vorbis"'],['Opus','audio/ogg; codecs="opus"'],['WAV','audio/wav']];
+  const supported=formats.filter(([,mime])=>['maybe','probably'].includes(check(mime))).map(([name])=>name);
+  return supported.length?`This browser reports possible playback for: ${supported.join(', ')}. Remote stream health is not tested.`:'This browser reports no capability for the checked formats. Remote stream health is not tested.';
+}
 export function loadFavorites(raw){try{const value=JSON.parse(raw);return Array.isArray(value)?[...new Set(value.filter(id=>stations.some(s=>s.id===id)))]:[];}catch{return [];}}
 export function loadLastStation(raw){return stations.find(station=>station.id===raw)??stations[0];}
 export function stationIndexForKey(index,length,key) {

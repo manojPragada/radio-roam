@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, streamFormatHint, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -27,6 +27,7 @@ $('#favorite').addEventListener('click',()=>{
 });
 const audio=$('#audio');let generation=0,watchdog=null,lastStream=null;
 const formatHint=document.createElement('p');formatHint.id='format-hint';formatHint.className='small muted';formatHint.setAttribute('aria-live','polite');$('#stream').after(formatHint);
+const capability=document.createElement('p');capability.id='capability';capability.className='small muted';capability.textContent=capabilitySummary(mime=>audio.canPlayType(mime));formatHint.after(capability);
 function updateFormatHint(){formatHint.textContent=streamFormatHint($('#stream').value);}$('#stream').addEventListener('input',updateFormatHint);updateFormatHint();
 const retry=document.createElement('button');retry.id='retry';retry.type='button';retry.textContent='Retry last stream';retry.disabled=true;$('#stop').after(retry);
 function clearWatchdog(){if(watchdog!==null)clearTimeout(watchdog);watchdog=null;}

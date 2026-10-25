@@ -9,10 +9,12 @@
 ## Next
 
 - [ ] Integrate an attributed station directory after verifying terms
-- [ ] Add codec-aware station health (session-only retry and non-authoritative filename hints complete)
+- [ ] Add codec-aware station health (session-only retry, filename hints and browser capability summary complete)
 - [ ] Add globe view and persistent last-played station
 
 ## Continuity
+
+2026-10-24: Added a local `canPlayType` capability summary for common audio containers/codecs while explicitly separating browser-declared capability from remote stream availability. Next: an attributed directory adapter with resilient broken-stream handling.
 
 2026-10-23: Added immediate, non-authoritative format hints for common audio filename extensions. Hints never probe the remote stream or claim browser capability/availability. Next: capability checks that remain distinct from remote health.
 

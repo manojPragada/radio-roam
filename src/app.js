@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, attemptLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -25,9 +25,10 @@ $('#favorite').addEventListener('click',()=>{
   try{localStorage.setItem('radio-roam-favorites',JSON.stringify(favorites));}catch{$('#status').textContent='Favorites available for this session only.';}
   render();
 });
-const audio=$('#audio');let generation=0,watchdog=null,lastStream=null;
+const audio=$('#audio');let generation=0,watchdog=null,lastStream=null,attempts=0;
 const formatHint=document.createElement('p');formatHint.id='format-hint';formatHint.className='small muted';formatHint.setAttribute('aria-live','polite');$('#stream').after(formatHint);
 const capability=document.createElement('p');capability.id='capability';capability.className='small muted';capability.textContent=capabilitySummary(mime=>audio.canPlayType(mime));formatHint.after(capability);
+const attemptStatus=document.createElement('p');attemptStatus.id='attempt-status';attemptStatus.className='small muted';attemptStatus.textContent=attemptLabel(0);capability.after(attemptStatus);
 function updateFormatHint(){formatHint.textContent=streamFormatHint($('#stream').value);}$('#stream').addEventListener('input',updateFormatHint);updateFormatHint();
 const retry=document.createElement('button');retry.id='retry';retry.type='button';retry.textContent='Retry last stream';retry.disabled=true;$('#stop').after(retry);
 function clearWatchdog(){if(watchdog!==null)clearTimeout(watchdog);watchdog=null;}
@@ -39,7 +40,7 @@ function armWatchdog(){
   watchdog=setTimeout(()=>{if(current===generation)halt('Connection or buffering timed out after 15 seconds. Try another direct stream.');},15000);
 }
 async function playStream(url){
-  halt('Connecting to your supplied stream…');const current=generation;audio.src=url;armWatchdog();
+  halt('Connecting to your supplied stream…');attemptStatus.textContent=attemptLabel(++attempts);const current=generation;audio.src=url;armWatchdog();
   try{await audio.play();if(current===generation){clearWatchdog();$('#status').textContent='Playing your supplied stream, independently of the fictional city selection.';}}
   catch{if(current===generation)halt('Unable to play. Check the URL, browser permission, codec or network.');}
 }

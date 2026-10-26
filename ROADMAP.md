@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-10-25: Added a session-only playback-attempt counter covering initial plays and retries, explicitly separated from remote health. Next: attributed directory adapter with resilient broken-stream handling.
+
 2026-10-24: Added a local `canPlayType` capability summary for common audio containers/codecs while explicitly separating browser-declared capability from remote stream availability. Next: an attributed directory adapter with resilient broken-stream handling.
 
 2026-10-23: Added immediate, non-authoritative format hints for common audio filename extensions. Hints never probe the remote stream or claim browser capability/availability. Next: capability checks that remain distinct from remote health.

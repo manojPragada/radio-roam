@@ -13,6 +13,7 @@ export function capabilitySummary(check){
   return supported.length?`This browser reports possible playback for: ${supported.join(', ')}. Remote stream health is not tested.`:'This browser reports no capability for the checked formats. Remote stream health is not tested.';
 }
 export function attemptLabel(attempt){const value=Number(attempt);return Number.isInteger(value)&&value>0?`Session playback attempt ${value} · not a remote health check`:'No playback attempt this session';}
+export function favoritesLabel(favorites){const count=loadFavorites(JSON.stringify(favorites)).length;return `${count} fictional ${count===1?'station':'stations'} saved locally`;}
 export function loadFavorites(raw){try{const value=JSON.parse(raw);return Array.isArray(value)?[...new Set(value.filter(id=>stations.some(s=>s.id===id)))]:[];}catch{return [];}}
 export function loadLastStation(raw){return stations.find(station=>station.id===raw)??stations[0];}
 export function stationIndexForKey(index,length,key) {

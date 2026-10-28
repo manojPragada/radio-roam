@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, visibleFavoritesLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -17,7 +17,7 @@ function render(){
     const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',(station.lon+180)/360*800);dot.setAttribute('cy',(90-station.lat)/180*400);dot.setAttribute('r',station===selected?8:4);dot.setAttribute('class','marker');$('#markers').append(dot);
   }
   $('#name').textContent=selected?.name??'No matching cities';$('#genre').textContent=selected?selected.genre+' · fictional station':'Change your search or turn off the saved filter.';
-  let summary=$('#favorites-summary');if(!summary){summary=document.createElement('p');summary.id='favorites-summary';summary.className='small muted';summary.setAttribute('aria-live','polite');$('#favorite').after(summary);}summary.textContent=favoritesLabel(favorites);const saved=selected&&favorites.includes(selected.id);$('#favorite').disabled=!selected;$('#favorite').textContent=saved?'★ Saved':'Save favorite';$('#favorite').setAttribute('aria-pressed',String(Boolean(saved)));
+  let summary=$('#favorites-summary');if(!summary){summary=document.createElement('p');summary.id='favorites-summary';summary.className='small muted';summary.setAttribute('aria-live','polite');$('#favorite').after(summary);}summary.textContent=`${favoritesLabel(favorites)} · ${visibleFavoritesLabel(items,favorites)}`;const saved=selected&&favorites.includes(selected.id);$('#favorite').disabled=!selected;$('#favorite').textContent=saved?'★ Saved':'Save favorite';$('#favorite').setAttribute('aria-pressed',String(Boolean(saved)));
 }
 $('#search').addEventListener('input',render);$('#saved-only').addEventListener('change',render);
 $('#favorite').addEventListener('click',()=>{

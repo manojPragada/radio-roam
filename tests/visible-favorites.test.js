@@ -1,0 +1,1 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {stations,visibleFavoritesLabel} from '../src/model.js';test('visible favorite count validates stored ids',()=>{assert.equal(visibleFavoritesLabel(stations.slice(0,2),['tokyo','bogus']),'1 saved station in current view');});

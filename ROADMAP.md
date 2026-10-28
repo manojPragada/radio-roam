@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-10-27: Added a current-view saved-station summary responsive to search and saved-only filtering without touching stream URLs. Next: attributed directory adapter with resilient broken-stream handling.
+
 2026-10-26: Added an accessible, filter-independent count of validated fictional favorites stored locally. Stream URLs remain memory-only. Next: attributed directory adapter with resilient broken-stream handling.
 
 2026-10-25: Added a session-only playback-attempt counter covering initial plays and retries, explicitly separated from remote health. Next: attributed directory adapter with resilient broken-stream handling.

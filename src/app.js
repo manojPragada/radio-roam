@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, visibleFavoritesLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, visibleFavoritesLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -26,6 +26,7 @@ $('#favorite').addEventListener('click',()=>{
   render();
 });
 const clearSaved=document.createElement('button');clearSaved.id='clear-saved';clearSaved.type='button';clearSaved.textContent='Clear saved';$('#favorite').after(clearSaved);clearSaved.addEventListener('click',()=>{favorites=clearFavorites();try{localStorage.removeItem('radio-roam-favorites');}catch{}$('#status').textContent='All locally saved fictional stations cleared.';render();});
+const exportSaved=document.createElement('button');exportSaved.id='export-saved';exportSaved.type='button';exportSaved.textContent='Export saved';clearSaved.after(exportSaved);exportSaved.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(favoriteExport(favorites),null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='radio-roam-favorites.json';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),0);$('#status').textContent='Exported fictional station metadata only; stream URLs were not included.';});
 const audio=$('#audio');let generation=0,watchdog=null,lastStream=null,attempts=0;
 const formatHint=document.createElement('p');formatHint.id='format-hint';formatHint.className='small muted';formatHint.setAttribute('aria-live','polite');$('#stream').after(formatHint);
 const capability=document.createElement('p');capability.id='capability';capability.className='small muted';capability.textContent=capabilitySummary(mime=>audio.canPlayType(mime));formatHint.after(capability);

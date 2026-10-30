@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-10-29: Added user-initiated JSON export for validated fictional favorite metadata; stream URLs are never included. Next: attributed directory adapter with resilient broken-stream handling.
+
 2026-10-28: Added an explicit accessible action to clear all locally saved fictional stations without touching stream URLs. Next: attributed directory adapter with resilient broken-stream handling.
 
 2026-10-27: Added a current-view saved-station summary responsive to search and saved-only filtering without touching stream URLs. Next: attributed directory adapter with resilient broken-stream handling.

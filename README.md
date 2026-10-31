@@ -1,0 +1,97 @@
+# Radio Roam
+
+A world-radio interface prototype with city discovery, saved favorites and an optional user-supplied HTTPS stream player.
+
+**Status:** working static prototype, no hosted deployment. See limitations below. This project uses no external assets, fonts, runtime dependencies, API keys or paid services.
+
+## Quick start
+
+Prerequisites: Python 3 for a local static server; Node.js 20+ for tests.
+
+```bash
+git clone https://github.com/manojPragada/radio-roam.git
+cd radio-roam
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+Open http://127.0.0.1:8000. Keep the terminal running; Ctrl+C stops it. Serve over HTTP rather than opening index.html as a file because the app uses ES modules.
+
+## Controls
+
+The most recently selected fictional city is stored locally and restored on the next visit. Only known bundled station IDs are accepted; stream URLs are never stored. Clear this site's browser storage to reset city and favorites.
+
+Search and select a demo city. In the city list, the arrow keys move focus (wrapping at either end) and Home/End jump to the first/last result; Enter or Space selects. Save favorites locally and use Saved cities only to filter them. Exported fictional favorites can be imported back from a bounded JSON file; only known bundled IDs are accepted and stream URLs are never exported or read. Empty searches clear the active selection and disable saving until a visible city is available. Paste a direct HTTPS audio-stream URL and press Play stream. A filename-extension hint and the browser's local `canPlayType` response describe common MP3, AAC, Ogg, Opus or WAV possibilities; neither claims remote availability or successful decoding. Playback begins only after a user gesture. Stop ends playback and clears the stream source. Retry last stream makes another user-initiated attempt during the open page; the URL is kept only in memory and the retry is cleared on reload. Native audio controls provide pause/resume and volume. Connection or buffering that does not recover within 15 seconds is stopped with a message. Stream playback is independent of the fictional city/station selection. Media error codes produce network/codec explanations.
+
+## Project structure
+
+```text
+index.html         semantic document and conventional navigation
+src/style.css      visual design, responsive and reduced-motion rules
+src/app.js         DOM wiring and interaction lifecycle
+src/model.js       pure state/data helpers
+tests/            Node behavioral tests (directory:tests/)
+ROADMAP.md         completed work and next priorities
+.env.example       configuration notes
+```
+
+## Architecture and configuration
+
+Vanilla ES modules keep the initial product runnable without a package install. The UI and pure model logic are separated. Relative asset URLs support hosting from a repository subdirectory. There are no environment variables or secrets; .env.example records this intentionally empty configuration contract.
+
+## Verification
+
+![Actual desktop prototype screenshot captured in Chromium](docs/preview-desktop.jpg)
+
+Preview: local synthetic/offline prototype, captured 2026-10-20; not a live service.
+
+Browser regression checks (development only; Node.js 24 and npm):
+
+```bash
+npm ci --ignore-scripts
+npx playwright install --with-deps chromium
+npm test
+npm run check
+npm run test:browser
+```
+
+The browser runner manages its own loopback server and checks desktop (1440px), mobile (390px), keyboard skip navigation, horizontal overflow, page errors, reduced motion and core interactions. Screenshots go to ignored test-results/. Optional CHROMIUM_EXECUTABLE_PATH selects an existing Chromium; PLAYWRIGHT_MODULE_PATH selects an installed Playwright module. The CI workflow skips private repositories. This is focused regression coverage, not a comprehensive accessibility audit or live-provider verification. The static app still requires no package installation.
+
+```bash
+npm test
+npm run check
+```
+
+Node's built-in test runner checks model behavior. The check script validates JavaScript syntax; it is not a linter or a browser accessibility audit. No production build step is needed. Desktop/mobile browser checks, if completed, are recorded in ROADMAP.md; do not infer browser coverage from unit tests alone.
+
+## Accessibility and performance
+
+Semantic controls, visible keyboard focus, a skip link, responsive layouts and reduced-motion CSS are included. Decorative motion is pausable where present. No autoplay audio, analytics or external font requests. Browser-based interfaces require JavaScript except for the portfolio's conventional project links. An automated accessibility audit has not been completed.
+
+## Data, assets and limitations
+
+Demo stations are fictional and have no bundled streams. No radio directory or live station data is connected. Stream availability, codecs, mixed content and browser restrictions can prevent playback. No station or streaming rights are claimed.
+
+All graphics and synthetic fixtures are original code in this repository. No third-party geographic dataset or media assets are bundled. No external API terms are relied upon in this prototype. Provider adapters will be documented and attributed before use.
+
+## Deployment
+
+The repository root is a static site. To publish on a static host, serve index.html with src/ at the same relative location and JavaScript files with an appropriate MIME type. No deployment has been performed or configured. Verify browser controls and data labels after deployment; do not add secrets to client code.
+
+## Troubleshooting
+
+- Blank page: use the HTTP server above, check browser console and confirm src/ is present.
+- Port in use: select a different port, such as 8001.
+- Tests unavailable: install Node.js 20+; there is no npm install step.
+- Animation absent: check reduced-motion preferences and the pause control.
+- Radio playback fails: use a direct playable HTTPS audio URL, not a webpage; network or codec support may prevent playback.
+
+## Contributing
+
+Use small, reviewable changes with a clear user benefit. Add model tests when behavior changes, run both verification commands, inspect desktop and mobile layouts, and update the roadmap and README. Use synthetic fixtures, preserve reduced-motion behavior and never commit secrets.
+
+## License
+
+A redistribution license has not yet been selected. Public visibility alone does not grant an open-source license.
+
+
+

@@ -18,6 +18,7 @@ export function visibleFavoritesLabel(visible,favorites){const saved=new Set(loa
 export function clearFavorites(){return [];}
 export function favoriteExport(favorites){const saved=new Set(loadFavorites(JSON.stringify(favorites)));return {version:1,kind:'radio-roam-fictional-favorites',stations:stations.filter(station=>saved.has(station.id)).map(({id,name,city,genre})=>({id,name,city,genre}))};}
 export function favoriteImport(value){if(!value||value.version!==1||value.kind!=='radio-roam-fictional-favorites'||!Array.isArray(value.stations)||value.stations.length>stations.length)throw new Error('Invalid Radio Roam favorites file');const ids=value.stations.map(item=>item?.id);if(!ids.every(id=>typeof id==='string'&&stations.some(station=>station.id===id)))throw new Error('Favorites file contains an unknown station');return [...new Set(ids)];}
+export function mergeFavorites(current,incoming){return loadFavorites(JSON.stringify([...loadFavorites(JSON.stringify(current)),...loadFavorites(JSON.stringify(incoming))]));}
 export function loadFavorites(raw){try{const value=JSON.parse(raw);return Array.isArray(value)?[...new Set(value.filter(id=>stations.some(s=>s.id===id)))]:[];}catch{return [];}}
 export function loadLastStation(raw){return stations.find(station=>station.id===raw)??stations[0];}
 export function stationIndexForKey(index,length,key) {

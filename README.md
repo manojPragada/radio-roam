@@ -4,6 +4,8 @@ A world-radio interface prototype with city discovery, saved favorites and an op
 
 **Status:** working static prototype, no hosted deployment. See limitations below. This project uses no external assets, fonts, runtime dependencies, API keys or paid services.
 
+Current discovery increment: the live favorites summary reports both saved and unsaved fictional stations in the current filtered view.
+
 ## Quick start
 
 Prerequisites: Python 3 for a local static server; Node.js 20+ for tests.

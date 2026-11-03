@@ -4,7 +4,7 @@ A world-radio interface prototype with city discovery, saved favorites and an op
 
 **Status:** working static prototype, no hosted deployment. See limitations below. This project uses no external assets, fonts, runtime dependencies, API keys or paid services.
 
-Current discovery increment: the live favorites summary reports both saved and unsaved fictional stations in the current filtered view.
+Current discovery increment: favorites import reports new additions, already-saved stations and the validated total while excluding stream URLs.
 
 ## Quick start
 

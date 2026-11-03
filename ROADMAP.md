@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-11-02: Added a precise accessible import result that distinguishes newly added fictional favorites from stations already saved. Validation remains bounded and stream URLs remain unread and unstored. Next: attributed directory adapter with resilient broken-stream handling.
+
 2026-11-01: Added an accessible unsaved-station count for the current search/filter view alongside validated saved counts. Stream URLs remain outside all persistence and summary logic. Next: attributed directory adapter with resilient broken-stream handling.
 
 2026-10-31: Changed bounded fictional-favorites import to merge validated known station IDs into the current set instead of silently replacing it. Duplicate IDs collapse and stream URLs remain unread and unstored. Next: attributed directory adapter with resilient broken-stream handling.

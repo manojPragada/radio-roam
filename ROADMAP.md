@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-11-04: Added an accessible saved-catalog coverage summary for the bounded fictional station directory. Counts validate known IDs and remain independent of stream URLs or remote health. Next: attributed directory adapter with resilient broken-stream handling.
+
 2026-11-03: Added a precise accessible export result for validated fictional favorites, including zero and singular states. Stream URLs remain excluded from the file and message. Next: attributed directory adapter with resilient broken-stream handling.
 
 2026-11-02: Added a precise accessible import result that distinguishes newly added fictional favorites from stations already saved. Validation remains bounded and stream URLs remain unread and unstored. Next: attributed directory adapter with resilient broken-stream handling.

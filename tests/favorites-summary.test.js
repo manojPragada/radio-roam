@@ -1,2 +1,3 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {favoritesLabel} from '../src/model.js';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {favoritesLabel,favoritesCatalogLabel} from '../src/model.js';
 test('favorite summary validates ids and pluralizes',()=>{assert.equal(favoritesLabel(['tokyo','bogus']),'1 fictional station saved locally');assert.equal(favoritesLabel([]),'0 fictional stations saved locally');});
+test('catalog summary reports validated fictional coverage',()=>{assert.equal(favoritesCatalogLabel(['tokyo','toronto','unknown']),'2/4 fictional catalog saved (50%)');assert.equal(favoritesCatalogLabel([]),'0/4 fictional catalog saved (0%)');});

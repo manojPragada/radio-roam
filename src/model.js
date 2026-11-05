@@ -14,6 +14,7 @@ export function capabilitySummary(check){
 }
 export function attemptLabel(attempt){const value=Number(attempt);return Number.isInteger(value)&&value>0?`Session playback attempt ${value} · not a remote health check`:'No playback attempt this session';}
 export function favoritesLabel(favorites){const count=loadFavorites(JSON.stringify(favorites)).length;return `${count} fictional ${count===1?'station':'stations'} saved locally`;}
+export function favoritesCatalogLabel(favorites){const count=loadFavorites(JSON.stringify(favorites)).length,percent=Math.round(count/stations.length*100);return `${count}/${stations.length} fictional catalog saved (${percent}%)`;}
 export function visibleFavoritesLabel(visible,favorites){const saved=new Set(loadFavorites(JSON.stringify(favorites))),count=visible.filter(station=>saved.has(station.id)).length;return `${count} saved ${count===1?'station':'stations'} in current view`;}
 export function visibleUnsavedLabel(visible,favorites){const saved=new Set(loadFavorites(JSON.stringify(favorites))),count=visible.filter(station=>!saved.has(station.id)).length;return `${count} unsaved ${count===1?'station':'stations'} in current view`;}
 export function clearFavorites(){return [];}

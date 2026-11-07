@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, favoritesCatalogLabel, favoriteActionsEnabled, visibleFavoritesLabel, visibleUnsavedLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, favoriteExportLabel, favoriteImport, favoriteMergeSummary, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, browserNetworkHint, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, favoritesCatalogLabel, favoriteActionsEnabled, visibleFavoritesLabel, visibleUnsavedLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, favoriteExportLabel, favoriteImport, favoriteMergeSummary, mediaErrorMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -50,15 +50,17 @@ async function playStream(url){
 $('#stream-form').addEventListener('submit',async event=>{
   event.preventDefault();updateFormatHint();const url=streamURL($('#stream').value);
   if(!url){$('#status').textContent='Use a direct HTTPS URL without embedded credentials.';return;}
-  lastStream=url;retry.disabled=false;await playStream(url);
+  lastStream=url;retry.disabled=false;const networkHint=browserNetworkHint(navigator.onLine);if(networkHint){$('#status').textContent=networkHint;return;}await playStream(url);
 });
-retry.addEventListener('click',()=>{if(lastStream)playStream(lastStream);});
+retry.addEventListener('click',()=>{if(!lastStream)return;const networkHint=browserNetworkHint(navigator.onLine);if(networkHint){$('#status').textContent=networkHint;return;}playStream(lastStream);});
 $('#stop').addEventListener('click',()=>halt());
 audio.addEventListener('error',()=>{if(audio.getAttribute('src'))halt(mediaErrorMessage(audio.error?.code));});
 audio.addEventListener('waiting',()=>{if(audio.getAttribute('src')){$('#status').textContent='Buffering your stream…';armWatchdog();}});
 audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.paused){clearWatchdog();$('#status').textContent='Playing your supplied stream.';}});
 audio.addEventListener('pause',()=>{if(audio.getAttribute('src')&&audio.paused&&(audio.currentTime>0||audio.readyState>=2)){clearWatchdog();$('#status').textContent='Stream paused. Resume with the audio controls.';}});
 audio.addEventListener('ended',()=>{clearWatchdog();if(audio.getAttribute('src'))$('#status').textContent='Stream ended.';});
+window.addEventListener('offline',()=>{halt(browserNetworkHint(false));retry.disabled=!lastStream;});
+window.addEventListener('online',()=>{if(lastStream)$('#status').textContent='This browser reports online. Retry the last stream when ready.';});
 window.addEventListener('pagehide',()=>{lastStream=null;retry.disabled=true;halt();});render();
 
 

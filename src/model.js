@@ -1,6 +1,7 @@
 export const stations=[{id:'tokyo',name:'Tokyo Afterglow',city:'Tokyo',genre:'Imagined late-night jazz',lon:140,lat:36},{id:'lisbon',name:'Lisbon Sol',city:'Lisbon',genre:'Imagined coastal grooves',lon:-9,lat:39},{id:'toronto',name:'Toronto Frequencies',city:'Toronto',genre:'Imagined independent sounds',lon:-79,lat:44},{id:'nairobi',name:'Nairobi Current',city:'Nairobi',genre:'Imagined future rhythms',lon:37,lat:-1}];
 export function filterStations(query){const q=query.trim().toLowerCase();return stations.filter(s=>(s.name+' '+s.city+' '+s.genre).toLowerCase().includes(q));}
 export function streamURL(value){try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password?url.href:null;}catch{return null;}}
+export function browserNetworkHint(online){return online===false?'This browser reports offline. Reconnect before retrying the stream.':'';}
 export function streamFormatHint(value){
   const valid=streamURL(value);if(!valid)return 'Enter a credential-free direct HTTPS URL to see a format hint.';
   const extension=new URL(valid).pathname.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];

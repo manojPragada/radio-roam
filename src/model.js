@@ -45,5 +45,10 @@ export function toggleFavorite(favorites, id) {
 export function mediaErrorMessage(code) {
   return ({1:'Playback was interrupted.',2:'Network error while loading the stream.',3:'The stream could not be decoded.',4:'Unsupported audio format or unavailable stream.'})[code]??'Unable to play this stream.';
 }
+export function streamRecoveryMessage(code,{retryAvailable=false,online=true}={}){
+  const base=mediaErrorMessage(code);
+  if(online===false)return `${base} This browser reports offline; reconnect before retrying.`;
+  return `${base} ${retryAvailable?'Retry the last stream or choose':'Choose'} another direct HTTPS URL.`;
+}
 
 

@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, browserNetworkHint, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, favoritesCatalogLabel, favoriteActionsEnabled, visibleFavoritesLabel, visibleUnsavedLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, favoriteExportLabel, favoriteImport, favoriteMergeSummary, mediaErrorMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, browserNetworkHint, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, favoritesCatalogLabel, favoriteActionsEnabled, visibleFavoritesLabel, visibleUnsavedLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, favoriteExportLabel, favoriteImport, favoriteMergeSummary, streamRecoveryMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -54,7 +54,7 @@ $('#stream-form').addEventListener('submit',async event=>{
 });
 retry.addEventListener('click',()=>{if(!lastStream)return;const networkHint=browserNetworkHint(navigator.onLine);if(networkHint){$('#status').textContent=networkHint;return;}playStream(lastStream);});
 $('#stop').addEventListener('click',()=>halt());
-audio.addEventListener('error',()=>{if(audio.getAttribute('src'))halt(mediaErrorMessage(audio.error?.code));});
+audio.addEventListener('error',()=>{if(audio.getAttribute('src'))halt(streamRecoveryMessage(audio.error?.code,{retryAvailable:Boolean(lastStream),online:navigator.onLine}));});
 audio.addEventListener('waiting',()=>{if(audio.getAttribute('src')){$('#status').textContent='Buffering your stream…';armWatchdog();}});
 audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.paused){clearWatchdog();$('#status').textContent='Playing your supplied stream.';}});
 audio.addEventListener('pause',()=>{if(audio.getAttribute('src')&&audio.paused&&(audio.currentTime>0||audio.readyState>=2)){clearWatchdog();$('#status').textContent='Stream paused. Resume with the audio controls.';}});

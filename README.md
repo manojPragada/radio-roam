@@ -4,7 +4,7 @@ A world-radio interface prototype with city discovery, saved favorites and an op
 
 **Status:** working static prototype, no hosted deployment. See limitations below. This project uses no external assets, fonts, runtime dependencies, API keys or paid services.
 
-Current playback increment: browser-reported offline state now blocks futile play/retry attempts with an explicit reconnect message while retaining the session-only URL for a later user-initiated retry. It does not claim remote stream health.
+Current playback increment: media failures now provide tested recovery guidance that distinguishes offline reconnects, retryable session URLs and choosing another direct HTTPS stream without claiming remote health.
 
 ## Quick start
 

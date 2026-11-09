@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {favoriteExport,favoriteExportLabel} from '../src/model.js';
+test('favorite export validates ids and contains no stream fields',()=>{const value=favoriteExport(['toronto','bad','toronto']);assert.equal(value.stations.length,1);assert.equal(value.stations[0].city,'Toronto');assert.equal(JSON.stringify(value).includes('url'),false);});
+test('favorite export label gives a precise safe count',()=>{assert.equal(favoriteExportLabel(['toronto','unknown']),'1 fictional station exported; no stream URLs included');assert.equal(favoriteExportLabel([]),'0 fictional stations exported; no stream URLs included');});

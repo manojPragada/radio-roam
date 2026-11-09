@@ -14,6 +14,8 @@
 
 ## Continuity
 
+2026-11-08: Added a tested session-only consecutive-failure counter that resets on successful playback or a different URL and recommends switching streams after repeated failures. It never auto-retries or claims remote health. Next: attributed directory adapter with resilient broken-stream handling.
+
 2026-11-07: Added tested recovery guidance for browser media errors, distinguishing offline reconnects, session-only retry availability and choosing another direct HTTPS URL. Next: attributed directory adapter with resilient broken-stream handling.
 
 2026-11-06: Added a tested browser-offline hint that blocks play/retry attempts until connectivity returns, while preserving the session-only URL and avoiding claims about remote stream health. Next: attributed directory adapter with resilient broken-stream handling.

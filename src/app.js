@@ -1,4 +1,4 @@
-import { stations, filterStations, streamURL, browserNetworkHint, streamFormatHint, capabilitySummary, attemptLabel, favoritesLabel, favoritesCatalogLabel, favoriteActionsEnabled, visibleFavoritesLabel, visibleUnsavedLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, favoriteExportLabel, favoriteImport, favoriteMergeSummary, streamRecoveryMessage, stationIndexForKey } from './model.js';
+import { stations, filterStations, streamURL, browserNetworkHint, streamFormatHint, capabilitySummary, attemptLabel, failureStreakLabel, favoritesLabel, favoritesCatalogLabel, favoriteActionsEnabled, visibleFavoritesLabel, visibleUnsavedLabel, loadFavorites, loadLastStation, chooseStation, toggleFavorite, clearFavorites, favoriteExport, favoriteExportLabel, favoriteImport, favoriteMergeSummary, streamRecoveryMessage, stationIndexForKey } from './model.js';
 const $=selector=>document.querySelector(selector);
 let selected=stations[0],favorites=[];
 try{favorites=loadFavorites(localStorage.getItem('radio-roam-favorites'));}catch{}
@@ -28,10 +28,11 @@ $('#favorite').addEventListener('click',()=>{
 const clearSaved=document.createElement('button');clearSaved.id='clear-saved';clearSaved.type='button';clearSaved.textContent='Clear saved';$('#favorite').after(clearSaved);clearSaved.addEventListener('click',()=>{favorites=clearFavorites();try{localStorage.removeItem('radio-roam-favorites');}catch{}$('#status').textContent='All locally saved fictional stations cleared.';render();});
 const exportSaved=document.createElement('button');exportSaved.id='export-saved';exportSaved.type='button';exportSaved.textContent='Export saved';clearSaved.after(exportSaved);exportSaved.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(favoriteExport(favorites),null,2)],{type:'application/json'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='radio-roam-favorites.json';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),0);$('#status').textContent=favoriteExportLabel(favorites)+'.';});
 const importInput=document.createElement('input');importInput.type='file';importInput.accept='application/json,.json';importInput.hidden=true;importInput.id='import-saved-file';const importSaved=document.createElement('button');importSaved.type='button';importSaved.id='import-saved';importSaved.textContent='Import saved';exportSaved.after(importSaved,importInput);importSaved.addEventListener('click',()=>importInput.click());importInput.addEventListener('change',async()=>{const file=importInput.files?.[0];importInput.value='';if(!file)return;if(file.size>32768){$('#status').textContent='Favorites file must be 32 KiB or smaller.';return;}try{const imported=favoriteImport(JSON.parse(await file.text())),summary=favoriteMergeSummary(favorites,imported);favorites=summary.merged;let stored=true;try{localStorage.setItem('radio-roam-favorites',JSON.stringify(favorites));}catch{stored=false;}$('#status').textContent=`Imported ${summary.added} new fictional favorites; ${summary.alreadySaved} already saved; ${summary.total} total. No stream URLs were read.${stored?'':' Saved for this session only.'}`;render();}catch{$('#status').textContent='Could not import this Radio Roam favorites file.';}});
-const audio=$('#audio');let generation=0,watchdog=null,lastStream=null,attempts=0;
+const audio=$('#audio');let generation=0,watchdog=null,lastStream=null,attempts=0,consecutiveFailures=0,lastFailedAttempt=0;
 const formatHint=document.createElement('p');formatHint.id='format-hint';formatHint.className='small muted';formatHint.setAttribute('aria-live','polite');$('#stream').after(formatHint);
 const capability=document.createElement('p');capability.id='capability';capability.className='small muted';capability.textContent=capabilitySummary(mime=>audio.canPlayType(mime));formatHint.after(capability);
 const attemptStatus=document.createElement('p');attemptStatus.id='attempt-status';attemptStatus.className='small muted';attemptStatus.textContent=attemptLabel(0);capability.after(attemptStatus);
+const failureStatus=document.createElement('p');failureStatus.id='failure-status';failureStatus.className='small muted';failureStatus.textContent=failureStreakLabel(0);attemptStatus.after(failureStatus);
 function updateFormatHint(){formatHint.textContent=streamFormatHint($('#stream').value);}$('#stream').addEventListener('input',updateFormatHint);updateFormatHint();
 const retry=document.createElement('button');retry.id='retry';retry.type='button';retry.textContent='Retry last stream';retry.disabled=true;$('#stop').after(retry);
 function clearWatchdog(){if(watchdog!==null)clearTimeout(watchdog);watchdog=null;}
@@ -40,23 +41,24 @@ function halt(message='Playback stopped.'){
 }
 function armWatchdog(){
   clearWatchdog();const current=generation;
-  watchdog=setTimeout(()=>{if(current===generation)halt('Connection or buffering timed out after 15 seconds. Try another direct stream.');},15000);
+  watchdog=setTimeout(()=>{if(current===generation){recordFailure();halt('Connection or buffering timed out after 15 seconds. Try another direct stream.');}},15000);
 }
+function recordFailure(){if(lastFailedAttempt===attempts)return;lastFailedAttempt=attempts;failureStatus.textContent=failureStreakLabel(++consecutiveFailures);}
 async function playStream(url){
   halt('Connecting to your supplied stream…');attemptStatus.textContent=attemptLabel(++attempts);const current=generation;audio.src=url;armWatchdog();
   try{await audio.play();if(current===generation){clearWatchdog();$('#status').textContent='Playing your supplied stream, independently of the fictional city selection.';}}
-  catch{if(current===generation)halt('Unable to play. Check the URL, browser permission, codec or network.');}
+  catch{if(current===generation){recordFailure();halt('Unable to play. Check the URL, browser permission, codec or network.');}}
 }
 $('#stream-form').addEventListener('submit',async event=>{
   event.preventDefault();updateFormatHint();const url=streamURL($('#stream').value);
   if(!url){$('#status').textContent='Use a direct HTTPS URL without embedded credentials.';return;}
-  lastStream=url;retry.disabled=false;const networkHint=browserNetworkHint(navigator.onLine);if(networkHint){$('#status').textContent=networkHint;return;}await playStream(url);
+  if(lastStream!==url){consecutiveFailures=0;lastFailedAttempt=0;failureStatus.textContent=failureStreakLabel(0);}lastStream=url;retry.disabled=false;const networkHint=browserNetworkHint(navigator.onLine);if(networkHint){$('#status').textContent=networkHint;return;}await playStream(url);
 });
 retry.addEventListener('click',()=>{if(!lastStream)return;const networkHint=browserNetworkHint(navigator.onLine);if(networkHint){$('#status').textContent=networkHint;return;}playStream(lastStream);});
 $('#stop').addEventListener('click',()=>halt());
-audio.addEventListener('error',()=>{if(audio.getAttribute('src'))halt(streamRecoveryMessage(audio.error?.code,{retryAvailable:Boolean(lastStream),online:navigator.onLine}));});
+audio.addEventListener('error',()=>{if(audio.getAttribute('src')){recordFailure();halt(streamRecoveryMessage(audio.error?.code,{retryAvailable:Boolean(lastStream),online:navigator.onLine}));}});
 audio.addEventListener('waiting',()=>{if(audio.getAttribute('src')){$('#status').textContent='Buffering your stream…';armWatchdog();}});
-audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.paused){clearWatchdog();$('#status').textContent='Playing your supplied stream.';}});
+audio.addEventListener('playing',()=>{if(audio.getAttribute('src')&&!audio.paused){clearWatchdog();consecutiveFailures=0;lastFailedAttempt=0;failureStatus.textContent=failureStreakLabel(0);$('#status').textContent='Playing your supplied stream.';}});
 audio.addEventListener('pause',()=>{if(audio.getAttribute('src')&&audio.paused&&(audio.currentTime>0||audio.readyState>=2)){clearWatchdog();$('#status').textContent='Stream paused. Resume with the audio controls.';}});
 audio.addEventListener('ended',()=>{clearWatchdog();if(audio.getAttribute('src'))$('#status').textContent='Stream ended.';});
 window.addEventListener('offline',()=>{halt(browserNetworkHint(false));retry.disabled=!lastStream;});

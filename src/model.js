@@ -50,5 +50,6 @@ export function streamRecoveryMessage(code,{retryAvailable=false,online=true}={}
   if(online===false)return `${base} This browser reports offline; reconnect before retrying.`;
   return `${base} ${retryAvailable?'Retry the last stream or choose':'Choose'} another direct HTTPS URL.`;
 }
+export function failureStreakLabel(count){const value=Number(count);if(!Number.isInteger(value)||value<1)return 'No consecutive playback failures this session';if(value===1)return '1 consecutive playback failure this session · retry remains user initiated';return `${value} consecutive playback failures this session · consider another direct HTTPS URL before retrying · no automatic retry`;}
 
 

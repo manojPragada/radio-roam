@@ -1,0 +1,2 @@
+import{describe,expect,it}from'vitest';import{searchStations,stations}from'./stations'
+describe('station discovery',()=>{it('searches location and genre',()=>{expect(searchStations('jazz')[0].city).toBe('Lisbon');expect(searchStations('Tokyo')[0].name).toBe('Neon Kissa')});it('filters favorites by stable demo ID',()=>{expect(searchStations('',true,new Set(['demo-toronto'])).map(s=>s.id)).toEqual(['demo-toronto']);expect(stations.every(s=>s.source==='synthetic-demo')).toBe(true)})})
